@@ -6,9 +6,17 @@ receivers:
       http:
         endpoint: "[::]:4318"
 
+processors:
+  batch: {}
+
 exporters:
   debug:
     verbosity: detailed
+  otlphttp/openobserve:
+    endpoint: ${env:OTLP_EXPORTER_OO_ENDPOINT}
+    headers:
+      authorization: ${env:OTLP_EXPORTER_OO_AUTH}
+      stream-name: default
 
 service:
   pipelines:
@@ -20,4 +28,5 @@ service:
       exporters: [debug]
     logs:
       receivers: [otlp]
-      exporters: [debug]
+      processors: [batch]
+      exporters: [debug, otlphttp/openobserve]
